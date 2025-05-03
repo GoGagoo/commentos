@@ -1,0 +1,88 @@
+.container_editor {
+	margin-top: 20px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	transition: border-color 0.3s ease;
+
+	&:focus-within {
+		border-color: blue;
+	}
+}
+
+.container_editor_user {
+	display: flex;
+	align-items: center;
+	margin: 20px auto 0 20px;
+	gap: 8px;
+}
+
+.container_editor_username {
+	font-size: 18px;
+	font-weight: 600;
+
+	&:hover {
+		cursor: pointer;
+		text-decoration: underline;
+	}
+}
+
+.container_editor_avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.container_editor_textarea {
+	width: 92%;
+	border: none;
+	resize: vertical;
+	min-height: 100px;
+	margin-inline: 10px;
+	padding: 10px;
+	outline: none;
+
+	&:focus {
+		border-color: #000;
+	}
+}
+
+.container_divide {
+	margin: 15px 20px 15px 20px;
+	border-top: 1px #ccc solid;
+}
+
+.container_editor_post {
+	margin-inline: 20px;
+	margin-block: 10px 20px;
+}
+
+.formatting_btns {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.container_editor_post_btn {
+	padding: 13px 20px;
+	color: #fff;
+	border: none;
+	font-size: 16px;
+	border-radius: 8px;
+	background-color: #0089ff;
+	cursor: pointer;
+	transition: all 0.3s ease;
+
+	&:hover {
+		background-color: #0c6fc5;
+	}
+
+	&:active {
+		background-color: blue;
+	}
+
+	&:focus {
+		outline: none;
+		box-shadow: 0 0 0 2px rgba(128, 145, 160, 0.5);
+	}
+}

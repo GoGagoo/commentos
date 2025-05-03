@@ -1,6 +1,7 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
+		"typeRoots": ["node_modules/@types"],
 		"moduleResolution": "node",
 		"paths": {
 			"@/*": ["src/*"],
@@ -16,5 +17,11 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true
-	}
+	},
+	"ts-node": {
+		"compilerOptions": {
+			"module": "CommonJS"
+		}
+	},
+	"include": ["./src/**/*.ts", "./src/**/*.tsx"]
 }

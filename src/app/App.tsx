@@ -1,10 +1,11 @@
+import { CommentSection } from '../widgets/CommentSection/ui/CommentSection/CommentSection'
 import React from 'react'
 
 const App: React.FC = () => {
 	return (
-		<div>
-			<h1>Barev, Ashxarh!</h1>
-		</div>
+		<>
+			<CommentSection />
+		</>
 	)
 }
 

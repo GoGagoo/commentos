@@ -1,18 +1,15 @@
 @use './styles/_vars' as *;
 
 @font-face {
-  font-family: "Roboto";
-  src: url('shared/assets/fonts/Roboto-Regular.woff2') format('woff2');
+  font-family: "Source Sans Pro";
+  src: url('shared/assets/fonts/SourceSansPro-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
 }
 
 html, body {
-	font-family: "Roboto";
+	font-family: "Source Sans Pro";
   font-style: normal;
-  height: 100%;
-  margin: 0;
-  padding: 0;
   background-color: $primary-bg-color;
 }
 

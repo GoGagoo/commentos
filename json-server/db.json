@@ -1,0 +1,16 @@
+{
+  "comments": [
+    {
+      "id": 1,
+      "author": "Jane Doe",
+      "content": "This is a great post!",
+      "timestamp": "2025-05-03T12:00:00Z"
+    },
+    {
+      "id": 2,
+      "author": "Bob Doe",
+      "content": "I agree with Alice!",
+      "timestamp": "2025-05-03T12:30:00Z"
+    }
+  ]
+}

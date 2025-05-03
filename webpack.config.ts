@@ -1,96 +1,119 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import path from 'path'
+import sass from 'sass'
 import webpack from 'webpack'
-
 import type { Configuration as DevServerConfiguration } from 'webpack-dev-server'
 
-const config: webpack.Configuration & { devServer: DevServerConfiguration } = {
+const config: webpack.Configuration & { devServer?: DevServerConfiguration } = {
 	entry: './src/index.tsx',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
 		filename: 'bundle.js',
+		clean: true,
+		publicPath: '/',
 	},
+
 	resolve: {
 		extensions: ['.tsx', '.ts', '.js'],
 	},
 
 	devServer: {
-		compress: true,
 		port: 3000,
-		open: true,
 		hot: true,
+		open: true,
+		historyApiFallback: true,
 	},
 
 	module: {
 		rules: [
 			{
-				test: /\.tsx?$/,
+				test: /\.(ts|tsx)$/,
 				exclude: /node_modules/,
-				loader: 'babel-loader',
-				options: {
-					presets: [
-						'@babel/preset-env',
-						'@babel/preset-react',
-						'@babel/preset-typescript',
-					],
+				use: {
+					loader: 'babel-loader',
+					options: {
+						presets: [
+							'@babel/preset-env',
+							'@babel/preset-react',
+							'@babel/preset-typescript',
+						],
+					},
 				},
 			},
 			{
-				test: /\.(woff2?|ttf|otf|eot)$/i,
+				test: /\.(png|jpg|jpeg|gif|webp)$/i,
 				type: 'asset/resource',
-				generator: {
-					filename: 'fonts/[name][ext]',
-				},
 			},
+			{
+				test: /\.module\.s[ac]ss$/i,
+				use: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							modules: {
+								localIdentName: '[name]__[local]--[hash:base64:5]',
+							},
+							sourceMap: true,
+						},
+					},
+					{
+						loader: 'sass-loader',
+						options: {
+							sourceMap: true,
+							implementation: sass,
+						},
+					},
+				],
+			},
+
 			{
 				test: /\.s[ac]ss$/i,
+				exclude: /\.module\.s[ac]ss$/i,
 				use: [
 					'style-loader',
 					'css-loader',
 					{
 						loader: 'sass-loader',
 						options: {
-							implementation: require('sass'), // Используем Dart Sass
+							sourceMap: true,
+							implementation: sass,
 						},
 					},
 				],
 			},
+
+			{
+				test: /\.(woff2?|eot|ttf|otf)$/i,
+				type: 'asset/resource',
+				generator: {
+					filename: 'fonts/[name][ext][query]',
+				},
+			},
+
 			{
 				test: /\.(png|jpe?g|gif)$/i,
-				use: [
-					{
-						loader: 'file-loader',
-					},
-				],
+				type: 'asset/resource',
+				generator: {
+					filename: 'images/[name][ext][query]',
+				},
 			},
+
 			{
 				test: /\.svg$/,
-				use: [
-					{
-						loader: '@svgr/webpack',
-						options: {
-							icon: true,
-							svgoConfig: {
-								plugins: [
-									{
-										name: 'convertColors',
-										params: {
-											currentColor: true,
-										},
-									},
-								],
-							},
-						},
-					},
-				],
+				issuer: /\.[jt]sx?$/,
+				use: ['@svgr/webpack'],
 			},
 		],
 	},
+
 	plugins: [
 		new HtmlWebpackPlugin({
 			template: './public/index.html',
 		}),
 	],
+
+	mode: 'development',
 }
 
 export default config
