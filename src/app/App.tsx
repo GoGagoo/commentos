@@ -1,5 +1,5 @@
-import { CommentSection } from '../widgets/CommentSection/ui/CommentSection/CommentSection'
 import React from 'react'
+import { CommentSection } from '../pages/CommentSection/CommentSection'
 
 const App: React.FC = () => {
 	return (

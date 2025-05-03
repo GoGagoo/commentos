@@ -47,23 +47,23 @@
 	}
 }
 
-.container_divide {
+.divide {
 	margin: 15px 20px 15px 20px;
 	border-top: 1px #ccc solid;
 }
 
-.container_editor_post {
+.editor_publish {
 	margin-inline: 20px;
 	margin-block: 10px 20px;
 }
 
-.formatting_btns {
+.editor_publish_formatting_btns {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 }
 
-.container_editor_post_btn {
+.comment_publish_btn {
 	padding: 13px 20px;
 	color: #fff;
 	border: none;
@@ -79,6 +79,10 @@
 
 	&:active {
 		background-color: blue;
+	}
+
+	&:disabled {
+		background-color: #0088ff68;
 	}
 
 	&:focus {

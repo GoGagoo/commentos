@@ -7,7 +7,7 @@
     "build": "webpack --mode production",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "serve": "json-server --watch json-server/db.json --port 3001"
+    "server": "json-server --watch json-server/db.json --port 3001 --static public"
   },
   "keywords": [],
   "author": "",
@@ -44,6 +44,7 @@
   "dependencies": {
     "@babel/core": "^7.27.1",
     "@babel/preset-env": "^7.27.1",
+    "axios": "^1.9.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   }

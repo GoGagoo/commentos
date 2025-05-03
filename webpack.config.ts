@@ -15,6 +15,9 @@ const config: webpack.Configuration & { devServer?: DevServerConfiguration } = {
 
 	resolve: {
 		extensions: ['.tsx', '.ts', '.js'],
+		alias: {
+			'@': path.resolve(__dirname, 'src'),
+		},
 	},
 
 	devServer: {
@@ -111,9 +114,10 @@ const config: webpack.Configuration & { devServer?: DevServerConfiguration } = {
 		new HtmlWebpackPlugin({
 			template: './public/index.html',
 		}),
+		// new webpack.DefinePlugin({
+		// 	'process.env.API_URL': JSON.stringify(process.env.API_URL),
+		// }),
 	],
-
-	mode: 'development',
 }
 
 export default config

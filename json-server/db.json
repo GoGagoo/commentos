@@ -1,16 +1,32 @@
 {
   "comments": [
     {
-      "id": 1,
+      "id": "1",
       "author": "Jane Doe",
       "content": "This is a great post!",
-      "timestamp": "2025-05-03T12:00:00Z"
+      "avatar": "/images/jane-doe.webp",
+      "createdAt": "2025-05-03T12:00:00Z"
     },
     {
-      "id": 2,
-      "author": "Bob Doe",
-      "content": "I agree with Alice!",
-      "timestamp": "2025-05-03T12:30:00Z"
+      "id": "2",
+      "author": "Roman Reigns",
+      "content": "GoGagoo don't AKNLOWLEDGE ME?!?!?!!",
+      "avatar": "/images/roman-reigns.webp",
+      "createdAt": "2025-05-03T12:30:00Z"
+    },
+    {
+      "id": "e128",
+      "author": "John Doe",
+      "content": "gg",
+      "createdAt": "2025-05-03T19:25:54.279Z",
+      "avatar": "/images/john-doe.webp"
+    },
+    {
+      "id": "55ee",
+      "author": "John Doe",
+      "content": "g",
+      "createdAt": "2025-05-03T19:52:00.073Z",
+      "avatar": "/images/john-doe.webp"
     }
   ]
 }
