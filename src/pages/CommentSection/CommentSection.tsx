@@ -7,11 +7,23 @@ import * as s from './CommentSection.module.scss'
 
 export const CommentSection = () => {
 	const [comments, setComments] = useState<Comment[]>([])
+	const [activeReplyId, setActiveReplyId] = useState<string | number | null>(
+		null,
+	)
 
 	useEffect(() => {
 		api
 			.get<Comment[]>('/comments')
-			.then((res) => setComments(res.data))
+			.then((res) => {
+				const topLevelComments = res.data.filter((c) => !c.parentId)
+				const replies = res.data.filter((rc) => rc.parentId)
+
+				const commentWithReplies = topLevelComments.map((comment) => ({
+					...comment,
+					replies: replies.filter((reply) => reply.parentId === comment.id),
+				}))
+				setComments(commentWithReplies)
+			})
 			.catch((error) => console.error(error))
 	}, [])
 
@@ -29,6 +41,62 @@ export const CommentSection = () => {
 			.catch((err) => console.error('Failed to add comment:', err))
 	}
 
+	const handleDeleteComment = (id: string | number) => {
+		api
+			.delete(`/comments/${id}`)
+			.then(() =>
+				setComments((prev) => prev.filter((comment) => comment.id !== id)),
+			)
+			.catch((err) => console.error('Failed to delete comment:', err))
+	}
+
+	const handleAddReply = (parentId: string | number, content: string) => {
+		const reply = {
+			author: 'John Doe',
+			content,
+			createdAt: new Date().toISOString,
+			avatar: '/images/john-doe.webp',
+			parentId,
+		}
+
+		api.post<Comment>(`/comments`, reply).then((res) => {
+			setComments((prev) =>
+				prev.map((comment) =>
+					comment.id === parentId
+						? {
+								...comment,
+								replies: [...(comment.replies || []), res.data],
+							}
+						: comment,
+				),
+			)
+			setActiveReplyId(null)
+		})
+	}
+
+	const handleDeleteReply = (
+		parentId: string | number,
+		replyId: string | number,
+	) => {
+		api
+			.delete(`/comments/${replyId}`)
+			.then(() => {
+				setComments((prev) =>
+					prev.map((comment) =>
+						comment.id === parentId
+							? {
+									...comment,
+									replies: comment.replies?.filter(
+										(reply) => reply.id !== replyId,
+									),
+								}
+							: comment,
+					),
+				)
+			})
+			.catch((err) => console.error('Failed to delete reply:', err))
+	}
+
 	return (
 		<>
 			<main className={s.container}>
@@ -42,6 +110,14 @@ export const CommentSection = () => {
 							content={comment.content}
 							createdAt={comment.createdAt}
 							avatar={comment.avatar}
+							onDelete={() => handleDeleteComment(comment.id)}
+							onReply={() => setActiveReplyId(comment.id)}
+							showReplyEditor={activeReplyId === comment.id}
+							onSubmitReply={(content) => handleAddReply(comment.id, content)}
+							replies={comment.replies}
+							onDeleteReply={(replyId) =>
+								handleDeleteReply(comment.id, replyId)
+							}
 						/>
 					))}
 				</div>
