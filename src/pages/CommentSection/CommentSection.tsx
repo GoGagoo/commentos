@@ -1,17 +1,25 @@
 import { Comment } from '@/entities/model/types'
 import { api } from '@/shared/api/api'
+import { NotFound } from '@/widgets/CommentSection/ui/NotFound/NotFound'
 import React, { useEffect, useState } from 'react'
 import { CommentItem } from '../../widgets/CommentSection/ui/CommentItem/CommentItem'
 import { Editor } from '../../widgets/CommentSection/ui/Editor/Editor'
 import * as s from './CommentSection.module.scss'
 
 export const CommentSection = () => {
-	const [comments, setComments] = useState<Comment[]>([])
+	const [comments, setComments] = useState<Comment[] | null>(null)
 	const [activeReplyId, setActiveReplyId] = useState<string | number | null>(
 		null,
 	)
+	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
+		setIsLoading(true)
+
+		const timer = setTimeout(() => {
+			setIsLoading(false)
+		}, 4000)
+
 		api
 			.get<Comment[]>('/comments')
 			.then((res) => {
@@ -23,8 +31,17 @@ export const CommentSection = () => {
 					replies: replies.filter((reply) => reply.parentId === comment.id),
 				}))
 				setComments(commentWithReplies)
+				clearTimeout(timer)
+				setIsLoading(false)
 			})
-			.catch((error) => console.error(error))
+			.catch((error) => {
+				console.error(error)
+				clearTimeout(timer)
+				setIsLoading(false)
+				setComments([])
+			})
+
+		return () => clearTimeout(timer)
 	}, [])
 
 	const handleAddComment = (content: string) => {
@@ -37,7 +54,7 @@ export const CommentSection = () => {
 
 		api
 			.post<Comment>('/comments', newComment)
-			.then((res) => setComments((prev) => [...prev, res.data]))
+			.then((res) => setComments((prev) => [...(prev || []), res.data]))
 			.catch((err) => console.error('Failed to add comment:', err))
 	}
 
@@ -45,7 +62,9 @@ export const CommentSection = () => {
 		api
 			.delete(`/comments/${id}`)
 			.then(() =>
-				setComments((prev) => prev.filter((comment) => comment.id !== id)),
+				setComments((prev) =>
+					(prev || []).filter((comment) => comment.id !== id),
+				),
 			)
 			.catch((err) => console.error('Failed to delete comment:', err))
 	}
@@ -61,7 +80,7 @@ export const CommentSection = () => {
 
 		api.post<Comment>(`/comments`, reply).then((res) => {
 			setComments((prev) =>
-				prev.map((comment) =>
+				(prev || []).map((comment) =>
 					comment.id === parentId
 						? {
 								...comment,
@@ -82,7 +101,7 @@ export const CommentSection = () => {
 			.delete(`/comments/${replyId}`)
 			.then(() => {
 				setComments((prev) =>
-					prev.map((comment) =>
+					(prev || []).map((comment) =>
 						comment.id === parentId
 							? {
 									...comment,
@@ -103,23 +122,40 @@ export const CommentSection = () => {
 				<div className={s.container_inner}>
 					<div className={s.container_inner_title}>Comments</div>
 					<Editor handleAddComment={handleAddComment} />
-					{comments.map((comment) => (
-						<CommentItem
-							key={comment.id}
-							author={comment.author}
-							content={comment.content}
-							createdAt={comment.createdAt}
-							avatar={comment.avatar}
-							onDelete={() => handleDeleteComment(comment.id)}
-							onReply={() => setActiveReplyId(comment.id)}
-							showReplyEditor={activeReplyId === comment.id}
-							onSubmitReply={(content) => handleAddReply(comment.id, content)}
-							replies={comment.replies}
-							onDeleteReply={(replyId) =>
-								handleDeleteReply(comment.id, replyId)
-							}
-						/>
-					))}
+					{isLoading &&
+						[...Array(3)].map((_, idx) => (
+							<CommentItem
+								key={idx}
+								isLoading
+								showReplyEditor={false}
+								onDelete={() => {}}
+								onReply={() => {}}
+								onSubmitReply={() => {}}
+								author=''
+								content=''
+								createdAt=''
+								avatar=''
+							/>
+						))}
+
+					{!isLoading && comments && comments.length === 0 && <NotFound />}
+
+					{!isLoading &&
+						comments &&
+						comments.length > 0 &&
+						comments.map((comment) => (
+							<CommentItem
+								key={comment.id}
+								{...comment}
+								onDelete={() => handleDeleteComment(comment.id)}
+								onReply={() => setActiveReplyId(comment.id)}
+								showReplyEditor={activeReplyId === comment.id}
+								onSubmitReply={(content) => handleAddReply(comment.id, content)}
+								onDeleteReply={(replyId) =>
+									handleDeleteReply(comment.id, replyId)
+								}
+							/>
+						))}
 				</div>
 			</main>
 		</>

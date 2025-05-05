@@ -10,6 +10,7 @@ interface Props {
 	avatar: string
 	showReplyEditor: boolean
 	replies?: Comment[]
+	isLoading?: boolean
 
 	onDelete: () => void
 	onReply: () => void
@@ -27,6 +28,7 @@ export const CommentItem: FC<Props> = ({
 	showReplyEditor,
 	onSubmitReply,
 	onDeleteReply,
+	isLoading = false,
 	replies = [],
 }) => {
 	const [replyText, setReplyText] = useState('')
@@ -34,12 +36,19 @@ export const CommentItem: FC<Props> = ({
 	const [isLiked, setIsLiked] = useState(false)
 
 	const handleLikeToggle = () => {
-		if (!isLiked) {
-			setLikes((prev) => prev + 1)
-		} else {
-			setLikes((prev) => prev - 1)
-		}
+		setLikes((prev) => prev + (isLiked ? -1 : 1))
 		setIsLiked(!isLiked)
+	}
+
+	if (isLoading) {
+		return (
+			<div className={s.comment_container}>
+				<div className={s.skeleton_avatar} />
+				<div className={s.skeleton_username} />
+				<div className={s.skeleton_text} />
+				<div className={s.skeleton_buttons} />
+			</div>
+		)
 	}
 
 	return (
@@ -51,18 +60,12 @@ export const CommentItem: FC<Props> = ({
 			<p className={s.comment_text}>{content}</p>
 			<div className={s.container_editor_post}>
 				<div className={s.formatting_btns}>
-					{isLiked ? (
-						<button
-							onClick={handleLikeToggle}
-							className={s.comment_like_btn_active}
-						>
-							{isLiked} Like {likes}
-						</button>
-					) : (
-						<button onClick={handleLikeToggle} className={s.comment_like_btn}>
-							{isLiked} Like {likes}
-						</button>
-					)}
+					<button
+						onClick={handleLikeToggle}
+						className={isLiked ? s.comment_like_btn_active : s.comment_like_btn}
+					>
+						{isLiked ? 'Unlike' : 'Like'} {likes}
+					</button>
 					<button onClick={onReply} className={s.comment_reply_btn}>
 						Reply
 					</button>

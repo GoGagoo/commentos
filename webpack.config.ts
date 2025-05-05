@@ -4,6 +4,8 @@ import sass from 'sass'
 import webpack from 'webpack'
 import type { Configuration as DevServerConfiguration } from 'webpack-dev-server'
 
+import Dotenv from 'dotenv-webpack'
+
 const config: webpack.Configuration & { devServer?: DevServerConfiguration } = {
 	entry: './src/index.tsx',
 	output: {
@@ -114,9 +116,7 @@ const config: webpack.Configuration & { devServer?: DevServerConfiguration } = {
 		new HtmlWebpackPlugin({
 			template: './public/index.html',
 		}),
-		// new webpack.DefinePlugin({
-		// 	'process.env.API_URL': JSON.stringify(process.env.API_URL),
-		// }),
+		new Dotenv(),
 	],
 }
 
