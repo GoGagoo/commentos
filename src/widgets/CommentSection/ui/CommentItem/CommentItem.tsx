@@ -1,5 +1,6 @@
 import { Comment } from '@/entities/model/types'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
+import { SkeletonComment } from '@/shared/ui/SkeletonComment/SkeletonComment'
 import React, { FC, useState } from 'react'
 import * as s from './CommentItem.module.scss'
 
@@ -40,16 +41,7 @@ export const CommentItem: FC<Props> = ({
 		setIsLiked(!isLiked)
 	}
 
-	if (isLoading) {
-		return (
-			<div className={s.comment_container}>
-				<div className={s.skeleton_avatar} />
-				<div className={s.skeleton_username} />
-				<div className={s.skeleton_text} />
-				<div className={s.skeleton_buttons} />
-			</div>
-		)
-	}
+	if (isLoading) return <SkeletonComment />
 
 	return (
 		<div className={s.comment_container}>
