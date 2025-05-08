@@ -1,5 +1,5 @@
 export interface Comment {
-	id: string | number
+	id: string
 	author: string
 	content: string
 	createdAt: string

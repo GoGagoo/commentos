@@ -1,206 +1,108 @@
-import { Comment } from '@/entities/model/types'
-import { api } from '@/shared/api/api'
+import {
+	useCreateCommentMutation,
+	useDeleteCommentMutation,
+	useGetCommentsQuery,
+} from '@/shared/api/rtkQuery'
 import { SkeletonComment } from '@/shared/ui/SkeletonComment/SkeletonComment'
+import { CommentItem } from '@/widgets/CommentSection/ui/CommentItem/CommentItem'
+import { Editor } from '@/widgets/CommentSection/ui/Editor/Editor'
 import { NotFound } from '@/widgets/CommentSection/ui/NotFound/NotFound'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import React, { useEffect, useRef, useState } from 'react'
-import { CommentItem } from '../../widgets/CommentSection/ui/CommentItem/CommentItem'
-import { Editor } from '../../widgets/CommentSection/ui/Editor/Editor'
+import React, { useRef, useState } from 'react'
 import * as s from './CommentSection.module.scss'
 
 export const CommentSection = () => {
-	const [comments, setComments] = useState<Comment[]>([])
 	const [activeReplyId, setActiveReplyId] = useState<string | number | null>(
 		null,
 	)
-	const [isLoading, setIsLoading] = useState(true)
-	const [isFetchingMore, setIsFetchingMore] = useState(false)
-	const [hasMoreComments, setHasMoreComments] = useState(true)
-
 	const parentRef = useRef<HTMLDivElement>(null)
+	
 
-	const delay = (ms: number) => new Promise((res) => setTimeout(res, ms))
+	const {
+		data: comments = [],
+		isLoading,
+		isFetching,
+		refetch,
+	} = useGetCommentsQuery()
 
-	const commentVisualCount = comments?.length + (isFetchingMore ? 2 : 0)
+	const [createComment] = useCreateCommentMutation()
+	const [deleteComment] = useDeleteCommentMutation()
+
+	const rootComments = comments.filter((c) => !c.parentId)
 
 	const rowVirtualizer = useVirtualizer({
-		count: commentVisualCount,
+		count: rootComments.length + (isFetching ? 2 : 0),
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => 178,
-		overscan: 0,
+		estimateSize: (index) => {
+			if (index >= rootComments.length) return 120
+
+			const comment = rootComments[index]
+			const repliesCount = comments.filter(
+				(c) => c.parentId === comment?.id,
+			).length
+			return 180 + repliesCount * 160
+		},
+		measureElement: (el) => el.getBoundingClientRect().height,
+		overscan: 5,
+		onChange: (virtualizer) => {
+			const items = virtualizer.getVirtualItems()
+			const lastItem = items[items.length - 1]
+			if (lastItem && lastItem.index >= rootComments.length - 1 && !isFetching)
+				refetch()
+		},
 	})
 
-	const fetchInitialComments = async () => {
-		try {
-			const res = await api.get<Comment[]>('/comments?_limit=10&_start=0')
-			const topLevelComments = res.data.filter((c) => !c.parentId)
-			const replies = res.data.filter((r) => r.parentId)
-
-			const withReplies = topLevelComments.map((comment) => ({
-				...comment,
-				replies: replies.filter((r) => r.parentId === comment.id),
-			}))
-
-			setComments(withReplies)
-			setHasMoreComments(res.data.length >= 10)
-		} catch (err) {
-			console.error(err)
-		} finally {
-			setIsLoading(false)
-		}
-	}
-
-	const fetchMoreComments = async () => {
-		setIsFetchingMore(true)
-		try {
-			await delay(1500)
-			const res = await api.get<Comment[]>(
-				`/comments?_limit=5&_start=${comments?.length}`,
-			)
-			const newTop = res.data.filter((c) => !c.parentId)
-			const replies = res.data.filter((r) => r.parentId)
-
-			const withReplies = newTop.map((comment) => ({
-				...comment,
-				replies: replies.filter((r) => r.parentId === comment.id),
-			}))
-
-			setComments((prev) => [...(prev || []), ...withReplies])
-			if (res.data.length < 5) setHasMoreComments(false)
-		} catch (err) {
-			console.error(err)
-		} finally {
-			setIsFetchingMore(false)
-		}
-	}
-
-	useEffect(() => {
-		fetchInitialComments()
-	}, [])
-
-	useEffect(() => {
-		const [lastItem] = [...rowVirtualizer.getVirtualItems()].reverse()
-		if (
-			lastItem &&
-			lastItem.index >= comments.length - 1 &&
-			!isFetchingMore &&
-			hasMoreComments
-		) {
-			fetchMoreComments()
-		}
-	}, [rowVirtualizer.getVirtualItems(), comments.length])
-
 	const handleAddComment = (content: string) => {
-		const newComment = {
+		createComment({
 			author: 'John Doe',
 			content,
-			createdAt: new Date().toISOString(),
 			avatar: '/images/john-doe.webp',
-		}
-
-		api
-			.post<Comment>('/comments', newComment)
-			.then((res) => setComments((prev) => [...(prev || []), res.data]))
-			.catch((err) => console.error('Failed to add comment:', err))
-	}
-
-	const handleDeleteComment = (id: string | number) => {
-		api
-			.delete(`/comments/${id}`)
-			.then(() =>
-				setComments((prev) =>
-					(prev || []).filter((comment) => comment.id !== id),
-				),
-			)
-			.catch((err) => console.error('Failed to delete comment:', err))
-	}
-
-	const handleAddReply = (parentId: string | number, content: string) => {
-		const reply = {
-			author: 'John Doe',
-			content,
-			createdAt: new Date().toISOString(),
-			avatar: '/images/john-doe.webp',
-			parentId,
-		}
-
-		api.post<Comment>(`/comments`, reply).then((res) => {
-			setComments((prev) =>
-				(prev || []).map((comment) =>
-					comment.id === parentId
-						? {
-								...comment,
-								replies: [...(comment.replies || []), res.data],
-							}
-						: comment,
-				),
-			)
-			setActiveReplyId(null)
+			createdAt: new Date().toISOString()
 		})
 	}
 
-	const handleDeleteReply = (
-		parentId: string | number,
-		replyId: string | number,
-	) => {
-		api
-			.delete(`/comments/${replyId}`)
-			.then(() => {
-				setComments((prev) =>
-					(prev || []).map((comment) =>
-						comment.id === parentId
-							? {
-									...comment,
-									replies: comment.replies?.filter(
-										(reply) => reply.id !== replyId,
-									),
-								}
-							: comment,
-					),
-				)
-			})
-			.catch((err) => console.error('Failed to delete reply:', err))
+	const handleDeleteComment = (id: string) => {
+		deleteComment(id)
+	}
+
+	const handleAddReply = (parentId: string | number, content: string) => {
+		createComment({
+			parentId,
+			author: 'John Doe',
+			content,
+			avatar: '/images/john-doe.webp',
+			createdAt: new Date().toISOString(),
+		}).then(() => setActiveReplyId(null))
 	}
 
 	return (
 		<main className={s.container}>
 			<div className={s.container_inner}>
-				<div className={s.container_inner_title}>Comments</div>
+				<h1 className={s.container_inner_title}>Comments</h1>
 				<Editor handleAddComment={handleAddComment} />
 
-				{isLoading &&
-					[...Array(3)].map((_, idx) => (
-						<CommentItem
-							key={idx}
-							isLoading
-							showReplyEditor={false}
-							onDelete={() => {}}
-							onReply={() => {}}
-							onSubmitReply={() => {}}
-							author=''
-							content=''
-							createdAt=''
-							avatar=''
-						/>
-					))}
-
-				{!isLoading && comments.length === 0 && <NotFound />}
-
-				{!isLoading && comments.length > 0 && (
+				{isLoading ? (
+					[...Array(3)].map((_, idx) => <SkeletonComment key={idx} />)
+				) : rootComments.length === 0 ? (
+					<NotFound />
+				) : (
 					<div ref={parentRef} className={s.visualizer_container}>
 						<div
 							style={{
 								height: `${rowVirtualizer.getTotalSize()}px`,
-								width: '100%',
 								position: 'relative',
+								width: '100%',
 							}}
 						>
 							{rowVirtualizer.getVirtualItems().map((virtualRow) => {
-								const isSkeleton = virtualRow.index >= comments.length
-								if (isSkeleton) {
+								const idx = virtualRow.index
+
+								if (idx >= rootComments.length) {
 									return (
 										<div
-											key={`skeleton-${virtualRow.index}`}
+											data-index={idx}
+											ref={rowVirtualizer.measureElement}
+											key={`skeleton-${idx}`}
 											style={{
 												position: 'absolute',
 												top: 0,
@@ -209,15 +111,23 @@ export const CommentSection = () => {
 												transform: `translateY(${virtualRow.start}px)`,
 											}}
 										>
-											<SkeletonComment />
+											<div className={s.comment_block}>
+												<SkeletonComment />
+											</div>
 										</div>
 									)
 								}
 
-								const comment = comments[virtualRow.index]
+								const rootComment = rootComments[idx]
+								const replies = comments.filter(
+									(c) => c.parentId === rootComment.id,
+								)
+
 								return (
 									<div
-										key={comment.id}
+										data-index={virtualRow.index}
+										ref={rowVirtualizer.measureElement}
+										key={rootComment.id}
 										style={{
 											position: 'absolute',
 											top: 0,
@@ -226,38 +136,31 @@ export const CommentSection = () => {
 											transform: `translateY(${virtualRow.start}px)`,
 										}}
 									>
-										<CommentItem
-											{...comment}
-											onDelete={() => handleDeleteComment(comment.id)}
-											onReply={() => setActiveReplyId(comment.id)}
-											showReplyEditor={activeReplyId === comment.id}
-											onSubmitReply={(content) =>
-												handleAddReply(comment.id, content)
-											}
-											onDeleteReply={(replyId) =>
-												handleDeleteReply(comment.id, replyId)
-											}
-										/>
+										<div className={s.comment_block}>
+											<CommentItem
+												{...rootComment}
+												replies={replies}
+												onDelete={() => handleDeleteComment(rootComment.id)}
+												onReply={() =>
+													setActiveReplyId((prev) =>
+														prev === rootComment.id ? null : rootComment.id,
+													)
+												}
+												showReplyEditor={activeReplyId === rootComment.id}
+												onSubmitReply={(content) =>
+													handleAddReply(rootComment.id, content)
+												}
+												onDeleteReply={(replyId) =>
+													handleDeleteComment(replyId)
+												}
+												activeReplyId={activeReplyId}
+												setActiveReplyId={setActiveReplyId}
+											/>
+										</div>
 									</div>
 								)
 							})}
 						</div>
-
-						{isFetchingMore && (
-							<div
-								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
-									width: '100%',
-									transform: `translateY(${rowVirtualizer.getTotalSize()}px)`,
-								}}
-							>
-								{[...Array(2)].map((_, i) => (
-									<SkeletonComment key={i} />
-								))}
-							</div>
-						)}
 					</div>
 				)}
 			</div>

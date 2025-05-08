@@ -18,8 +18,9 @@
 
 .visualizer_container {
 	position: relative;
-	height: 720px;
-	overflow: auto;
+  height: 500px;
+  overflow-y: auto;
+	margin-top: 40px;
 }
 
 .visualizer_inner {
@@ -30,4 +31,12 @@
 
 .loader {
 	font-size: 60px;
+}
+
+.comment_block {
+	position: relative;
+  z-index: 1; 
+  background: white;
+  margin-bottom: 30px;
+  border-radius: 8px;
 }

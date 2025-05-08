@@ -1,31 +1,38 @@
 import { Comment } from '@/entities/model/types'
 import { formatRelativeTime } from '@/shared/lib/formatRelativeTime'
 import { SkeletonComment } from '@/shared/ui/SkeletonComment/SkeletonComment'
-import React, { FC, useState } from 'react'
+import React, { FC, useRef, useState } from 'react'
 import * as s from './CommentItem.module.scss'
+import { useOnClickOutside } from '@/shared/lib/useOnClickOutside'
 
 interface Props {
-	author: string
-	content: string
-	createdAt: string
-	avatar: string
-	showReplyEditor: boolean
+	id?: string | number | undefined
+	author?: string
+	content?: string
+	createdAt?: string
+	avatar?: string
+	showReplyEditor?: boolean
 	replies?: Comment[]
 	isLoading?: boolean
+	activeReplyId?: string | number | null
+	setActiveReplyId?: (id: string | number | null) => void
 
-	onDelete: () => void
-	onReply: () => void
-	onSubmitReply: (content: string) => void
-	onDeleteReply?: (id: string | number) => void
+	onDelete?: (id: string) => void
+	onReply?: () => void
+	onSubmitReply?: (content: string) => void
+	onDeleteReply?: (id: string) => void
 }
 
 export const CommentItem: FC<Props> = ({
+	id,
 	author,
 	content,
 	createdAt,
 	avatar,
 	onDelete,
 	onReply,
+	activeReplyId,
+	setActiveReplyId,
 	showReplyEditor,
 	onSubmitReply,
 	onDeleteReply,
@@ -35,6 +42,8 @@ export const CommentItem: FC<Props> = ({
 	const [replyText, setReplyText] = useState('')
 	const [likes, setLikes] = useState(0)
 	const [isLiked, setIsLiked] = useState(false)
+	const containerRef = useRef<HTMLDivElement | null>(null)
+	const replyEditorRef = useRef<HTMLDivElement | null>(null)
 
 	const handleLikeToggle = () => {
 		setLikes((prev) => prev + (isLiked ? -1 : 1))
@@ -43,8 +52,14 @@ export const CommentItem: FC<Props> = ({
 
 	if (isLoading) return <SkeletonComment />
 
+	useOnClickOutside<HTMLDivElement>(replyEditorRef, () => {
+    if (showReplyEditor && setActiveReplyId) {
+      setActiveReplyId(null)
+    }
+  })
+
 	return (
-		<div className={s.comment_container}>
+		<div ref={containerRef} className={s.comment_container}>
 			<div className={s.comment_user}>
 				<img className={s.comment_user_avatar} src={avatar} alt='john-doe' />
 				<p className={s.comment_user_username}>{author}</p>
@@ -61,17 +76,22 @@ export const CommentItem: FC<Props> = ({
 					<button onClick={onReply} className={s.comment_reply_btn}>
 						Reply
 					</button>
-					<button onClick={onDelete} className={s.comment_delete_btn}>
+					<button
+						onClick={() => {
+							if (onDelete && id !== undefined) onDelete(String(id))
+						}}
+						className={s.comment_delete_btn}
+					>
 						Delete
 					</button>
 					<p className={s.comment_created_at}>
-						{formatRelativeTime(createdAt)}
+						{createdAt ? formatRelativeTime(createdAt) : ''}
 					</p>
 				</div>
 			</div>
 
 			{showReplyEditor && (
-				<div className={s.reply_editor}>
+				<div ref={replyEditorRef} className={s.reply_editor}>
 					<textarea
 						className={s.reply_textarea}
 						value={replyText}
@@ -86,8 +106,10 @@ export const CommentItem: FC<Props> = ({
 								type='submit'
 								disabled={!replyText}
 								onClick={() => {
-									onSubmitReply(replyText)
-									setReplyText('')
+									if (onSubmitReply) {
+										onSubmitReply(replyText)
+										setReplyText('')
+									}
 								}}
 								className={s.reply_publish_btn}
 							>
@@ -102,18 +124,25 @@ export const CommentItem: FC<Props> = ({
 				{replies.map((reply) => (
 					<div key={reply.id} className={s.reply_comment}>
 						<CommentItem
+							id={reply.id}
 							key={reply.id}
 							author={reply.author}
 							content={reply.content}
 							createdAt={reply.createdAt}
 							avatar={reply.avatar}
-							onDelete={() => onDeleteReply?.(reply.id)}
-							onReply={onReply}
-							showReplyEditor={false}
-							onSubmitReply={() => {}}
+							onDelete={() => {
+								if (onDeleteReply && reply.id) onDeleteReply(reply.id)
+							}}
+							onReply={() => setActiveReplyId?.(reply.id)}
+							showReplyEditor={activeReplyId === reply.id}
+							onSubmitReply={(content) => {
+								if (onSubmitReply) onSubmitReply(content)
+							}}
+							activeReplyId={activeReplyId}
+							setActiveReplyId={setActiveReplyId}
 						/>
 						<p className={s.reply_comment_created_at}>
-							{formatRelativeTime(createdAt)}
+							{reply.createdAt ? formatRelativeTime(reply.createdAt) : ''}
 						</p>
 					</div>
 				))}
