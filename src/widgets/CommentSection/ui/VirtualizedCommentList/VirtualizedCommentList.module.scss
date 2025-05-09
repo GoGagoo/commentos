@@ -1,0 +1,20 @@
+.visualizer_container {
+	position: relative;
+  height: 500px;
+  overflow-y: auto;
+	margin-top: 40px;
+}
+
+.visualizer_inner {
+	position: relative;
+	height: 100px;
+	overflow: auto;
+}
+
+.comment_block {
+	position: relative;
+  z-index: 1; 
+  background: white;
+  margin-bottom: 30px;
+  border-radius: 8px;
+}
