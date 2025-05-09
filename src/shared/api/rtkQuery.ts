@@ -30,12 +30,20 @@ export const rtkQueryApi = createApi({
 			}),
 			invalidatesTags: [{ type: 'Comment', id: 'LIST' }],
 		}),
-		deleteComment: builder.mutation<{ success: boolean; id: string }, string>({
+		deleteComment: builder.mutation<void, string>({
 			query: (id) => ({
-				url: `comments/${id}`,
+				url: `/comments/${id}`,
 				method: 'DELETE',
 			}),
-			invalidatesTags: (result, error, id) => [{ type: 'Comment', id }],
+			invalidatesTags: ['Comment'],
+		}),
+		updateComment: builder.mutation<Comment, Partial<Comment>>({
+			query: ({ id, ...patch }) => ({
+				url: `comments/${id}`,
+				method: 'PATCH',
+				body: patch,
+			}),
+			invalidatesTags: (result, error, { id }) => [{ type: 'Comment', id }],
 		}),
 	}),
 })
@@ -44,4 +52,5 @@ export const {
 	useGetCommentsQuery,
 	useCreateCommentMutation,
 	useDeleteCommentMutation,
+	useUpdateCommentMutation,
 } = rtkQueryApi

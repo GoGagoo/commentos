@@ -16,7 +16,6 @@ export const CommentSection = () => {
 		null,
 	)
 	const parentRef = useRef<HTMLDivElement>(null)
-	
 
 	const {
 		data: comments = [],
@@ -54,24 +53,37 @@ export const CommentSection = () => {
 
 	const handleAddComment = (content: string) => {
 		createComment({
-			author: 'John Doe',
+			author: {
+				name: 'John Doe',
+				avatar: '/images/john-doe.webp',
+			},
 			content,
-			avatar: '/images/john-doe.webp',
-			createdAt: new Date().toISOString()
+			createdAt: new Date().toISOString(),
+			likes: 0,
+			isLikedByUser: false,
 		})
 	}
 
-	const handleDeleteComment = (id: string) => {
-		deleteComment(id)
+	const handleDeleteComment = async (id: string) => {
+		try {
+			await deleteComment(id).unwrap()
+			refetch()
+		} catch (err) {
+			console.error('Error deleting comment:', err)
+		}
 	}
 
-	const handleAddReply = (parentId: string | number, content: string) => {
+	const handleAddReply = (parentId: string, content: string) => {
 		createComment({
 			parentId,
-			author: 'John Doe',
+			author: {
+				name: 'John Doe',
+				avatar: '/images/john-doe.webp',
+			},
 			content,
-			avatar: '/images/john-doe.webp',
 			createdAt: new Date().toISOString(),
+			likes: 0,
+			isLikedByUser: false,
 		}).then(() => setActiveReplyId(null))
 	}
 
@@ -119,9 +131,6 @@ export const CommentSection = () => {
 								}
 
 								const rootComment = rootComments[idx]
-								const replies = comments.filter(
-									(c) => c.parentId === rootComment.id,
-								)
 
 								return (
 									<div
@@ -138,23 +147,26 @@ export const CommentSection = () => {
 									>
 										<div className={s.comment_block}>
 											<CommentItem
-												{...rootComment}
-												replies={replies}
-												onDelete={() => handleDeleteComment(rootComment.id)}
+												comment={{
+													...rootComment,
+													replies: comments.filter(
+														(c) => c.parentId === rootComment.id,
+													),
+													likes: rootComment.likes || 0,
+													isLikedByUser: rootComment.isLikedByUser || false,
+													createdAt:
+														rootComment.createdAt || new Date().toISOString(),
+												}}
+												onDelete={handleDeleteComment}
 												onReply={() =>
 													setActiveReplyId((prev) =>
 														prev === rootComment.id ? null : rootComment.id,
 													)
 												}
-												showReplyEditor={activeReplyId === rootComment.id}
 												onSubmitReply={(content) =>
 													handleAddReply(rootComment.id, content)
 												}
-												onDeleteReply={(replyId) =>
-													handleDeleteComment(replyId)
-												}
 												activeReplyId={activeReplyId}
-												setActiveReplyId={setActiveReplyId}
 											/>
 										</div>
 									</div>

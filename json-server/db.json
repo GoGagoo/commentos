@@ -1,96 +1,37 @@
 {
   "comments": [
     {
-      "id": "2",
-      "author": "Roman Reigns",
-      "content": "GoGagoo don't ACKNOWLEDGE ME?!?!?!!",
-      "avatar": "/images/roman-reigns.webp",
-      "createdAt": "2025-05-03T12:30:00Z"
+      "id": "ecc0",
+      "author": {
+        "name": "Roman Reigns",
+        "avatar": "/images/roman-reigns.webp"
+      },
+      "content": "This is my yard!",
+      "createdAt": "2025-05-09T13:46:56.861Z",
+      "likes": 100,
+      "isLikedByUser": false
     },
     {
-      "id": "bf78",
-      "author": "John Doe",
-      "content": "g",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:40.178Z"
+      "id": "87c8",
+      "author": {
+        "name": "Jane Doe",
+        "avatar": "/images/jane-doe.webp"
+      },
+      "content": "Hello everyone!",
+      "createdAt": "2025-05-09T13:48:05.343Z",
+      "likes": 0,
+      "isLikedByUser": false
     },
     {
-      "id": "ebbb",
-      "author": "John Doe",
-      "content": "g",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:41.468Z"
-    },
-    {
-      "id": "6a2b",
-      "author": "John Doe",
-      "content": "f",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:43.207Z"
-    },
-    {
-      "id": "e866",
-      "author": "John Doe",
-      "content": "e",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:44.346Z"
-    },
-    {
-      "id": "26ef",
-      "author": "John Doe",
-      "content": "z",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:52.771Z"
-    },
-    {
-      "id": "15d9",
-      "author": "John Doe",
-      "content": "s",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:53.755Z"
-    },
-    {
-      "id": "94d0",
-      "author": "John Doe",
-      "content": "g",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:55.213Z"
-    },
-    {
-      "id": "9ad4",
-      "author": "John Doe",
-      "content": "h",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:56.196Z"
-    },
-    {
-      "id": "7b39",
-      "author": "John Doe",
-      "content": "k",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:57.858Z"
-    },
-    {
-      "id": "0baf",
-      "author": "John Doe",
-      "content": "t",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:49:58.948Z"
-    },
-    {
-      "id": "bfdd",
-      "author": "John Doe",
-      "content": "e",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-07T11:50:00.265Z"
-    },
-    {
-      "id": "8612",
-      "parentId": "2",
-      "author": "John Doe",
-      "content": "g",
-      "avatar": "/images/john-doe.webp",
-      "createdAt": "2025-05-08T09:49:40.888Z"
+      "id": "c025",
+      "author": {
+        "name": "John Doe",
+        "avatar": "/images/john-doe.webp"
+      },
+      "content": "Yo wassup gang",
+      "createdAt": "2025-05-09T13:48:15.074Z",
+      "likes": 0,
+      "isLikedByUser": false
     }
   ]
 }
