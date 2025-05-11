@@ -17,6 +17,7 @@ export const ReplyEditor: FC<Props> = ({ onSubmit, onClose }) => {
 		if (replyText.trim()) {
 			onSubmit(replyText)
 			setReplyText('')
+			onClose()
 		}
 	}
 
