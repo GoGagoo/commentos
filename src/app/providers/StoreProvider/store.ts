@@ -9,4 +9,5 @@ const store = configureStore({
 		getDefaultMiddleware().concat(rtkQueryApi.middleware),
 })
 
+export type RootState = ReturnType<typeof store.getState>
 export default store

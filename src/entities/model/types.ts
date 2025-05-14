@@ -11,3 +11,7 @@ export interface Comment {
 	parentId?: string
 	replies?: Comment[]
 }
+
+export interface CommentWithReplies extends Comment {
+	replies: Comment[]
+}

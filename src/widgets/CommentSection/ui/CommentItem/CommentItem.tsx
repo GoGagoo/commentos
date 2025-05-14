@@ -2,25 +2,31 @@ import { Comment } from '@/entities/model/types'
 import { useUpdateCommentMutation } from '@/shared/api/rtkQuery'
 import { SkeletonComment } from '@/shared/ui/SkeletonComment/SkeletonComment'
 import React, { FC, useRef } from 'react'
+import { useCommentActions } from '../../hooks/useCommentActions'
 import { CommentActions } from '../CommentActions/CommentActions'
-import { ReplyEditor } from '../ReplyEditor/ReplyEditor'
+import { ReplyCommentForm } from '../ReplyCommentForm/ReplyCommentForm'
 import * as s from './CommentItem.module.scss'
 
 interface Props {
 	isLoading?: boolean
 	comment: Comment
-	activeReplyId?: string | number | null
-
-	onDelete: (id: string) => void
+	activeReplyId?: string | null
+	onSubmitReply?: (parentId: string, content: string) => void
+	onDelete?: (id: string) => void
 	onReply?: () => void
-	onSubmitReply?: (content: string) => void
 }
 
-export const CommentItem: FC<Props> = ({ comment, ...props }) => {
+export const CommentItem: FC<Props> = ({
+	comment,
+	isLoading,
+	activeReplyId,
+	onReply,
+}) => {
 	const containerRef = useRef<HTMLDivElement | null>(null)
 
-	const [updateComment] = useUpdateCommentMutation()
+	const { handleDeleteComment, handleAddComment } = useCommentActions()
 
+	const [updateComment] = useUpdateCommentMutation()
 
 	const handleLikeToggle = async () => {
 		try {
@@ -34,7 +40,7 @@ export const CommentItem: FC<Props> = ({ comment, ...props }) => {
 		}
 	}
 
-	if (props.isLoading) return <SkeletonComment />
+	if (isLoading) return <SkeletonComment />
 
 	return (
 		<div ref={containerRef} className={s.comment_container}>
@@ -49,18 +55,23 @@ export const CommentItem: FC<Props> = ({ comment, ...props }) => {
 			<p className={s.comment_text}>{comment.content}</p>
 			<CommentActions
 				commentId={comment.id}
-				likes={comment.likes}
-				isLiked={comment.isLikedByUser}
-				createdAt={comment.createdAt}
+				likes={comment.likes || 0}
+				isLiked={comment.isLikedByUser || false}
+				createdAt={comment.createdAt || new Date().toISOString()}
 				onLike={handleLikeToggle}
-				onReply={() => props.onReply?.()}
-				onDelete={() => props.onDelete(comment.id)}
+				onReply={() => onReply?.()}
+				onDelete={() => handleDeleteComment(comment.id)}
 			/>
 
-			{props.activeReplyId === comment.id && props.onSubmitReply && (
-				<ReplyEditor
-					onSubmit={props.onSubmitReply}
-					onClose={() => props.onReply?.()}
+			{activeReplyId === comment.id && handleAddComment && (
+				<ReplyCommentForm
+					onSubmit={(content) => {
+						if (!comment.id) return
+						handleAddComment(content, comment.id)
+						onReply?.()
+					}}
+					parentId={comment.id}
+					onClose={() => onReply?.()}
 				/>
 			)}
 
@@ -70,10 +81,10 @@ export const CommentItem: FC<Props> = ({ comment, ...props }) => {
 						<CommentItem
 							key={reply.id}
 							comment={reply}
-							onDelete={props.onDelete}
-							onReply={props.onReply}
-							onSubmitReply={props.onSubmitReply}
-							activeReplyId={props.activeReplyId}
+							onDelete={handleDeleteComment}
+							onReply={onReply}
+							onSubmitReply={handleAddComment}
+							activeReplyId={activeReplyId}
 						/>
 					))}
 				</div>

@@ -1,22 +1,34 @@
 import { useOnClickOutside } from '@/shared/lib/useOnClickOutside'
 import React, { FC, useRef, useState } from 'react'
-import * as s from './ReplyEditor.module.scss'
+import * as s from './ReplyCommentForm.module.scss'
 
 interface Props {
-	onSubmit: (content: string) => void
+	onSubmit: (content: string, parentId?: string) => void
 	onClose: () => void
+	parentId: string
 }
 
-export const ReplyEditor: FC<Props> = ({ onSubmit, onClose }) => {
+export const ReplyCommentForm: FC<Props> = ({
+	onSubmit,
+	onClose,
+	parentId,
+}) => {
 	const [replyText, setReplyText] = useState('')
+	const [isSubmitting, setIsSubmitting] = useState(false)
 	const editorRef = useRef<HTMLDivElement>(null)
 
 	useOnClickOutside(editorRef, onClose)
 
-	const handleSubmit = () => {
-		if (replyText.trim()) {
-			onSubmit(replyText)
+	const handleSubmit = async () => {
+		if (!replyText.trim()) return
+
+		setIsSubmitting(true)
+		try {
+			await onSubmit(replyText, parentId)
 			setReplyText('')
+			onClose()
+		} finally {
+			setIsSubmitting(false)
 			onClose()
 		}
 	}
@@ -39,7 +51,7 @@ export const ReplyEditor: FC<Props> = ({ onSubmit, onClose }) => {
 						onClick={handleSubmit}
 						className={s.reply_publish_btn}
 					>
-						Reply
+						{isSubmitting ? 'Sending' : 'Retry'}
 					</button>
 				</div>
 			</div>

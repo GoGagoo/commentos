@@ -19,7 +19,7 @@ export const CommentActions: FC<CommentActionsProps> = ({
 	likes = 0,
 	isLiked = false,
 	createdAt,
-	commentId
+	commentId,
 }) => (
 	<div className={s.container_editor_post}>
 		<div className={s.formatting_btns}>
@@ -35,13 +35,13 @@ export const CommentActions: FC<CommentActionsProps> = ({
 				</button>
 			)}
 			{onDelete && (
-        <button 
-          onClick={() => onDelete(commentId)}
-          className={s.comment_delete_btn}
-        >
-          Delete
-        </button>
-      )}
+				<button
+					onClick={() => onDelete(commentId)}
+					className={s.comment_delete_btn}
+				>
+					Delete
+				</button>
+			)}
 			<p className={s.comment_created_at}>
 				{createdAt ? formatRelativeTime(createdAt) : ''}
 			</p>

@@ -34,79 +34,14 @@
       "isLikedByUser": false
     },
     {
-      "id": "5286",
+      "id": "6d4a",
+      "content": "а",
+      "parentId": null,
       "author": {
         "name": "John Doe",
         "avatar": "/images/john-doe.webp"
       },
-      "content": "п",
-      "createdAt": "2025-05-10T20:22:33.506Z",
-      "likes": 0,
-      "isLikedByUser": false
-    },
-    {
-      "id": "1264",
-      "author": {
-        "name": "John Doe",
-        "avatar": "/images/john-doe.webp"
-      },
-      "content": "к",
-      "createdAt": "2025-05-10T20:22:34.669Z",
-      "likes": 0,
-      "isLikedByUser": false
-    },
-    {
-      "id": "c154",
-      "author": {
-        "name": "John Doe",
-        "avatar": "/images/john-doe.webp"
-      },
-      "content": "у",
-      "createdAt": "2025-05-10T20:22:35.955Z",
-      "likes": 0,
-      "isLikedByUser": false
-    },
-    {
-      "id": "0f4d",
-      "author": {
-        "name": "John Doe",
-        "avatar": "/images/john-doe.webp"
-      },
-      "content": "ч",
-      "createdAt": "2025-05-10T20:22:37.538Z",
-      "likes": 0,
-      "isLikedByUser": false
-    },
-    {
-      "id": "0772",
-      "author": {
-        "name": "John Doe",
-        "avatar": "/images/john-doe.webp"
-      },
-      "content": "ы",
-      "createdAt": "2025-05-10T20:22:39.186Z",
-      "likes": 0,
-      "isLikedByUser": false
-    },
-    {
-      "id": "01d3",
-      "author": {
-        "name": "John Doe",
-        "avatar": "/images/john-doe.webp"
-      },
-      "content": "я",
-      "createdAt": "2025-05-10T20:22:40.413Z",
-      "likes": 0,
-      "isLikedByUser": false
-    },
-    {
-      "id": "33f3",
-      "author": {
-        "name": "John Doe",
-        "avatar": "/images/john-doe.webp"
-      },
-      "content": "р",
-      "createdAt": "2025-05-10T20:22:41.533Z",
+      "createdAt": "2025-05-14T09:38:37.083Z",
       "likes": 0,
       "isLikedByUser": false
     }

@@ -7,35 +7,41 @@ export const rtkQueryApi = createApi({
 	baseQuery: fetchBaseQuery({
 		baseUrl: API_ROOT,
 	}),
-	tagTypes: ['Comment'],
+	tagTypes: ['Comments'],
 	endpoints: (builder) => ({
 		getComments: builder.query<Comment[], void>({
-			query: () => 'comments',
-			providesTags: (result) =>
-				result
-					? [
-							...result.map(({ id }) => ({
-								type: 'Comment' as const,
-								id,
-							})),
-							{ type: 'Comment', id: 'LIST' },
-						]
-					: [{ type: 'Comment', id: 'LIST' }],
+			query: () => {
+				return 'comments'
+			},
+			transformResponse: (response: Comment[]) => {
+				return response
+			},
+			providesTags: ['Comments'],
 		}),
 		createComment: builder.mutation<Comment, Partial<Comment>>({
 			query: (body) => ({
 				url: 'comments',
 				method: 'POST',
-				body,
+				body: {
+					...body,
+					author: body.author || {
+						name: 'John Doe',
+						avatar: '/images/john-doe.webp',
+					},
+					createdAt: body.createdAt || new Date().toISOString(),
+					likes: body.likes || 0,
+					isLikedByUser: body.isLikedByUser || false,
+					parentId: body.parentId !== undefined ? body.parentId : null,
+				},
 			}),
-			invalidatesTags: [{ type: 'Comment', id: 'LIST' }],
+			invalidatesTags: ['Comments'],
 		}),
 		deleteComment: builder.mutation<void, string>({
 			query: (id) => ({
 				url: `/comments/${id}`,
 				method: 'DELETE',
 			}),
-			invalidatesTags: ['Comment'],
+			invalidatesTags: ['Comments'],
 		}),
 		updateComment: builder.mutation<Comment, Partial<Comment>>({
 			query: ({ id, ...patch }) => ({
@@ -43,7 +49,7 @@ export const rtkQueryApi = createApi({
 				method: 'PATCH',
 				body: patch,
 			}),
-			invalidatesTags: (result, error, { id }) => [{ type: 'Comment', id }],
+			invalidatesTags: ['Comments'],
 		}),
 	}),
 })

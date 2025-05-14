@@ -9,21 +9,14 @@
 	padding-bottom: 15px;
 }
 
-.comment_like_btn {
+%button_base {
 	padding: 8px 15px;
-	color: #fff;
-	border: none;
 	font-size: 16px;
 	border-radius: 8px;
-	background-color: #0089ff;
 	cursor: pointer;
 	transition: all 0.3s ease;
-	border: 1px #0089ff solid;
-
-	&:hover {
-		background-color: transparent;
-		color: #0c6fc5;
-	}
+	border-style: solid;
+	border-width: 1px;
 
 	&:focus {
 		outline: none;
@@ -31,70 +24,54 @@
 	}
 }
 
-.comment_like_btn_active {
-	padding: 8px 15px;
-	color: #0089ff;
-	border: none;
-	font-size: 16px;
-	border-radius: 8px;
-	background-color: #fff;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	border: 1px #0089ff solid;
+%button_theme_blue {
+	color: #fff;
+	background-color: #0089ff;
+	border-color: #0089ff;
+	&:hover {
+		background-color: transparent;
+		color: #0c6fc5;
+	}
+}
 
+%button_theme_blue_active {
+	color: #0089ff;
+	background-color: #fff;
+	border-color: #0089ff;
 	&:hover {
 		background-color: #0c6fc5;
 		color: #fff;
 	}
-
-	&:focus {
-		outline: none;
-		box-shadow: 0 0 0 2px rgba(128, 145, 160, 0.5);
-	}
 }
 
-.comment_reply_btn {
-	padding: 8px 15px;
+%button_theme_red {
 	color: #fff;
-	border: none;
-	font-size: 16px;
-	border-radius: 8px;
-	background-color: #0089ff;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	border: 1px #0089ff solid;
-
-	&:hover {
-		background-color: transparent;
-		color: #0c6fc5;
-	}
-
-	&:focus {
-		outline: none;
-		box-shadow: 0 0 0 2px rgba(128, 145, 160, 0.5);
-	}
-}
-
-.comment_delete_btn {
-	padding: 8px 15px;
-	color: #fff;
-	border: none;
-	font-size: 16px;
-	border-radius: 8px;
 	background-color: #e70810;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	border: 1px #e70810 solid;
-
+	border-color: #e70810;
 	&:hover {
 		background-color: transparent;
 		color: #9f181c;
 	}
+}
 
-	&:focus {
-		outline: none;
-		box-shadow: 0 0 0 2px rgba(128, 145, 160, 0.5);
-	}
+.comment_like_btn {
+	@extend %button_base;
+	@extend %button_theme_blue;
+}
+
+.comment_like_btn_active {
+	@extend %button_base;
+	@extend %button_theme_blue_active;
+}
+
+.comment_reply_btn {
+	@extend %button_base;
+	@extend %button_theme_blue;
+}
+
+.comment_delete_btn {
+	@extend %button_base;
+	@extend %button_theme_red;
 }
 
 .comment_created_at {

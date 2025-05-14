@@ -1,13 +1,12 @@
-import React, { FC, useState } from 'react'
+import React, { useState } from 'react'
 import johnDoeImage from '../../../../../public/images/john-doe.webp'
-import * as s from './Editor.module.scss'
+import { useCommentActions } from '../../hooks/useCommentActions'
+import * as s from './UserCommentForm.module.scss'
 
-interface Props {
-	handleAddComment: (event: string) => void
-}
-
-export const Editor: FC<Props> = ({ handleAddComment }) => {
+export const UserCommentForm = () => {
 	const [commentText, setCommentText] = useState('')
+
+	const { handleAddComment } = useCommentActions()
 
 	const handleClick = () => {
 		if (!commentText.trim()) return
