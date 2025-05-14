@@ -6,13 +6,38 @@ import type { Configuration as DevServerConfiguration } from 'webpack-dev-server
 
 import Dotenv from 'dotenv-webpack'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 const config: webpack.Configuration & { devServer?: DevServerConfiguration } = {
 	entry: './src/index.tsx',
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		filename: 'bundle.js',
+		filename: isProd ? 'js/[name].[contenthash].js' : 'js/[name].js',
+		chunkFilename: isProd
+			? 'js/[name].[contenthash].chunk.js'
+			: 'js/[name].chunk.js',
 		clean: true,
 		publicPath: '/',
+	},
+
+	mode: isProd ? 'production' : 'development',
+	devtool: isProd ? false : 'source-map',
+
+	optimization: {
+		minimize: isProd,
+		splitChunks: {
+			chunks: 'all',
+			cacheGroups: {
+				vendors: {
+					test: /[\\/]node_modules[\\/]/,
+					name: 'vendors',
+					chunks: 'all',
+				},
+			},
+		},
+		runtimeChunk: {
+			name: 'runtime',
+		},
 	},
 
 	resolve: {
@@ -23,7 +48,7 @@ const config: webpack.Configuration & { devServer?: DevServerConfiguration } = {
 	},
 
 	devServer: {
-		port: 3000,
+		port: 3002,
 		hot: true,
 		open: true,
 		historyApiFallback: true,
