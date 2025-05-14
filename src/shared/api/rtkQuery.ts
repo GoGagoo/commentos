@@ -1,28 +1,24 @@
-import { API_ROOT } from '@/entities/model/constants'
 import { Comment } from '@/entities/model/types'
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi } from '@reduxjs/toolkit/query/react'
+import { axiosBaseQuery } from './axiosBaseQuery'
 
 export const rtkQueryApi = createApi({
 	reducerPath: 'api',
-	baseQuery: fetchBaseQuery({
-		baseUrl: API_ROOT,
-	}),
+	baseQuery: axiosBaseQuery(),
 	tagTypes: ['Comments'],
 	endpoints: (builder) => ({
 		getComments: builder.query<Comment[], void>({
-			query: () => {
-				return 'comments'
-			},
-			transformResponse: (response: Comment[]) => {
-				return response
-			},
+			query: () => ({
+				url: 'comments',
+				method: 'GET',
+			}),
 			providesTags: ['Comments'],
 		}),
 		createComment: builder.mutation<Comment, Partial<Comment>>({
 			query: (body) => ({
 				url: 'comments',
 				method: 'POST',
-				body: {
+				data: {
 					...body,
 					author: body.author || {
 						name: 'John Doe',
@@ -38,7 +34,7 @@ export const rtkQueryApi = createApi({
 		}),
 		deleteComment: builder.mutation<void, string>({
 			query: (id) => ({
-				url: `/comments/${id}`,
+				url: `comments/${id}`,
 				method: 'DELETE',
 			}),
 			invalidatesTags: ['Comments'],
@@ -47,7 +43,7 @@ export const rtkQueryApi = createApi({
 			query: ({ id, ...patch }) => ({
 				url: `comments/${id}`,
 				method: 'PATCH',
-				body: patch,
+				data: patch,
 			}),
 			invalidatesTags: ['Comments'],
 		}),
